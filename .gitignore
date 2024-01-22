@@ -1,0 +1,6 @@
+.vercel/
+.vscode/
+flagged/
+__pycache__/
+
+.vercel

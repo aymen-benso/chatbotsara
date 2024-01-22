@@ -1,21 +1,16 @@
 from flask import Flask, request, jsonify , render_template
 import requests
-import os   
-from flask import send_from_directory
+
+api_key = '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'
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/' , methods=['GET'])
 def index():
     return render_template('index.html')
 
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
-api_key = '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'
 
 @app.route('/api/get_ai_snippets', methods=['GET'])
 def get_ai_snippets():
