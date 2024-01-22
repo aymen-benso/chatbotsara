@@ -5,7 +5,7 @@ api_key = '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'
 
 app = Flask(__name__)
 
-@app.route('/' , methods=['GET'])
+@app.route('/')
 def index():
     return render_template('index.html')
 
