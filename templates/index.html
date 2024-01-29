@@ -98,9 +98,13 @@ animation-delay:400ms;
                 <div class="px-4 py-5 chat-box bg-white">
                     <select class="custom-select custom-select-lg mb-3">
                         <option value="gpt-3.5-turbo">gpt-3.5-turbo</option>
-                        <option value="gpt-3.5">gpt-4-turbo</option>
+                        <option value="gpt-4-1106-preview">gpt-4-1106-preview</option>
                         <option value="gpt-4">gpt-4</option>
                     </select>                  
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                        <label class="form-check-label" for="flexSwitchCheckDefault">With internet Access</label>
+                      </div>
                     <!-- Chat messages will appear here -->
                     
                 </div>
@@ -149,21 +153,32 @@ document.getElementById('chatForm').addEventListener('submit', function(e) {
     userMessage.textContent = query;
     userMessage.className = 'chat-message chat-text user-message';
     chatBox.appendChild(userMessage);
-
-    fetch('/api/get_ai_snippets?query='+query+'&gptv='+gptv)
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('typing').style.display = 'none';
-        displayResponse(data, chatBox);
-        document.getElementById("query").value = '';
-    }).catch(error => {
-        console.error('Error:', error);
-    });
+    if(document.getElementById("flexSwitchCheckDefault").checked) {
+        fetch('/api/withsearch?query='+query+'&gptv='+gptv+'&internet=1')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('typing').style.display = 'none';
+            displayResponse(data, chatBox);
+            document.getElementById("query").value = '';
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    } else {
+        fetch('/api/get_ai_snippets?query='+query+'&gptv='+gptv)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('typing').style.display = 'none';
+            displayResponse(data, chatBox);
+            document.getElementById("query").value = '';
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    }
 });
 
 function displayResponse(data, chatBox) {
-    if(data.choices.length > 0) {
-            let messageContent = data.choices[0].message.content;
+    if(data.length > 0) {
+            let messageContent = data;
             var section = document.createElement('div');
             section.className = 'chat-message response-message';
 

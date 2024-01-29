@@ -1,7 +1,17 @@
 from flask import Flask, request, jsonify , render_template
 import requests
+from openai import OpenAI
+import json
+from testt import get_answer
 
-api_key = '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'
+google_api_key = "AIzaSyAZvPEKmK2qPK6TVaP9-tqOi3GpTAFanFU"
+google_cx = "e3a2db6e7281d4629"
+
+
+client = OpenAI(
+    api_key='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',
+    organization='org-yui7Ie8osHV9jytpHdWaIdRv',
+)
 
 app = Flask(__name__)
 
@@ -17,27 +27,24 @@ def get_ai_snippets():
     query = request.args.get('query')
     gptv = request.args.get('gptv')
     try:
-        response = requests.post(
-            "https://api.openai.com/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "openai-organization": "org-yui7Ie8osHV9jytpHdWaIdRv",
-                "Content-Type": "application/json"
-            },
-            json={
-                "model": gptv,
-                "messages": [
-                    {"role": "system", "content": "genius"},
-                    {"role": "user", "content": query},
-                ],
-                "max_tokens": 1000
-            }
+        completion = client.chat.completions.create(
+        model=gptv,
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": query}
+        ]
         )
-        response.raise_for_status()
-        return jsonify(response.json())
+
+        return (json.dumps(completion.choices[0].message.content)) # if ChatCompletionMessage has a to_dict method
     except requests.exceptions.RequestException as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/withsearch', methods=['GET'])
+def test():
+
+    results = get_answer(request.args.get('query'), request.args.get('gptv'))
+    
+    return json.dumps(results)
 
 if __name__ == '__main__':
     app.run(debug=True)
